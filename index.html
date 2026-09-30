@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#060504" />
+<title data-bind="herName">لكِ وحدك — A Little Universe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@400;500;600&family=Cinzel:wght@400;500;600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="pre">
+
+<!-- ═══════════ BACKGROUND LAYERS ═══════════ -->
+<canvas id="bg"></canvas>
+<div id="vignette"></div>
+<div id="grain"></div>
+<div id="cursor-glow"></div>
+
+<!-- ═══════════ CINEMATIC LETTERBOX ═══════════ -->
+<div id="letterbox"><div class="lb lb-t"></div><div class="lb lb-b"></div></div>
+
+<!-- ═══════════ INTRO ═══════════ -->
+<div id="intro">
+  <div class="intro-inner">
+    <p class="intro-line il-1">✦</p>
+    <p class="intro-line il-2">A&nbsp;LITTLE&nbsp;WORLD</p>
+    <p class="intro-line il-name" data-bind="herName">—</p>
+    <p class="intro-line il-4">أهلاً بكِ.</p>
+  </div>
+  <button id="intro-skip" class="btn-skip">تخطّي</button>
+</div>
+
+<!-- ═══════════ LOCK SCREEN ═══════════ -->
+<div id="lock" hidden>
+  <div class="lock-inner">
+    <div class="lock-initial" data-bind="herInitial">س</div>
+    <p class="lock-line">هذا المكان لم يُصمَّم للجميع.</p>
+    <p class="lock-line">إنه لشخصٍ واحدٍ فقط.</p>
+    <form id="lock-form" autocomplete="off">
+      <input id="lock-code" type="password" inputmode="numeric" maxlength="12" placeholder="الرمز السري" aria-label="الرمز السري" />
+      <button type="submit" class="btn-gold magnetic">
+        <span>ENTER&nbsp;THE&nbsp;EXPERIENCE</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+    <p id="lock-hint" class="lock-hint"></p>
+    <p id="lock-error" class="lock-error" role="alert"></p>
+  </div>
+</div>
+
+<!-- ═══════════ CINEMATIC ENTRANCE ═══════════ -->
+<div id="entrance" hidden aria-hidden="true">
+  <div class="ent-panel ent-l"></div>
+  <div class="ent-panel ent-r"></div>
+  <div class="ent-seam"></div>
+  <div class="ent-beam"></div>
+  <div class="ent-flare"></div>
+  <div id="ent-title">
+    <span>WELCOME TO YOUR</span>
+    <span class="ent-title-big">LITTLE UNIVERSE</span>
+  </div>
+</div>
+
+<!-- ═══════════ EXPERIENCE ═══════════ -->
+<div id="experience" hidden>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button id="btn-menu" class="icon-btn magnetic" aria-label="القائمة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+    </button>
+    <div class="tb-center">
+      <div class="tb-brand" data-bind="herInitial">س</div>
+      <span class="tb-sep hide-sm"></span>
+      <span id="tb-chapter" class="hide-sm">PROLOGUE</span>
+    </div>
+    <div class="tb-tools">
+      <button id="btn-sound" class="icon-btn magnetic" aria-label="الصوت">
+        <svg class="ic-vol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></svg>
+        <svg class="ic-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m22 9-6 6M16 9l6 6"/></svg>
+      </button>
+      <button id="btn-theme" class="icon-btn magnetic" aria-label="السمة">
+        <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- PROGRESS -->
+  <div id="progressbar"><span id="progressbar-fill"></span></div>
+
+  <!-- RAIL -->
+  <nav id="rail" aria-label="التنقل بين الفصول"></nav>
+
+  <!-- ROOM VEIL -->
+  <div id="room-veil"><i></i><span>✦</span></div>
+
+  <!-- ═══════════ ROOMS ═══════════ -->
+  <div id="room-wrap">
+
+    <!-- ══════ ROOM: HERO ══════ -->
+    <section id="room-hero" class="room active" data-tb="WELCOME">
+      <div class="hero-inner">
+        <p class="hero-kicker rv">✦&nbsp;&nbsp;THE PRIVATE MUSEUM OF&nbsp;&nbsp;✦</p>
+        <h1 class="hero-name rv" data-bind="herName">—</h1>
+        <div class="hero-rule rv"><i></i><b>✦</b><i></i></div>
+        <p class="hero-main rv">مرحبًا بكِ في المكان الذي صنعتهُ لكِ.</p>
+        <p class="hero-sub rv">ليس موقعًا… بل عالمًا صغيرًا يشبهكِ. تجوّلي فيه ببطء.</p>
+
+        <!-- Time-based greeting -->
+        <p id="time-greeting" class="hero-sub rv" style="margin-top:10px;font-style:italic;color:var(--gold);"></p>
+
+        <button class="btn-gold goto-next magnetic rv" data-next="1">
+          <span>افتحي رسالتك</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+        <p class="hero-sub rv" style="margin-top:30px;font-size:.78rem;color:var(--faint)">
+          هناك أشياء مخفيّة في هذا العالم… <b style="color:var(--gold)">سبعة أسرار</b> تحديدًا
+        </p>
+      </div>
+      <button id="sec-star-hero" class="secret-star" aria-label="نجمة مخفية">✦</button>
+      <div class="scroll-hint"><span>↓</span></div>
+    </section>
+
+    <!-- ══════ ROOM: LETTER ══════ -->
+    <section id="room-letter" class="room" data-tb="THE LETTER">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;·&nbsp;<b>BEFORE&nbsp;EVERYTHING</b></p>
+          <h2 class="ch-title-en rv">THE&nbsp;LETTER</h2>
+          <h3 class="ch-title-ar rv">الرسالة</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">“To the girl who doesn't know how much she means to me…”</p>
+        </header>
+        <div class="env-stage" id="env-stage">
+          <div id="envelope" class="envelope rv" role="button" tabindex="0" aria-label="افتحي الظرف">
+            <div class="env-back"></div>
+            <div class="env-paper"><i data-bind="herName">—</i><span style="font-size:.7rem;color:#8a7a5a;margin-top:6px">✦</span></div>
+            <div class="env-front"></div>
+            <div class="env-flap"></div>
+            <button id="sec-seal" class="env-seal" aria-label="الختم">✦</button>
+            <div class="env-glow"></div>
+          </div>
+          <p class="env-hint">اضغطي على الظرف</p>
+        </div>
+        <div id="letter-card" class="letter-card" hidden>
+          <div class="paper-shine"></div>
+          <div class="type-wrap">
+            <div id="type-target" class="type-target"></div>
+            <span id="type-caret" class="type-caret"></span>
+          </div>
+          <div class="letter-post" id="letter-post" hidden>
+            <span class="lp-rule"></span>
+            <p>«لكن قبل أن تقرئي الباقي…»</p>
+            <p>«هناك أشياء أريدكِ أن تكتشفيها بنفسك.»</p>
+            <button class="btn-gold goto-next magnetic" data-next="2">
+              <span>ابدئي الرحلة</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: BEGINNING ══════ -->
+    <section id="room-beginning" class="room" data-tb="THE BEGINNING">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;01</p>
+          <h2 class="ch-title-en rv">THE&nbsp;BEGINNING</h2>
+          <h3 class="ch-title-ar rv">البداية</h3>
+          <span class="ch-rule"></span>
+        </header>
+        <div class="cols">
+          <figure class="art-frame rv tilt">
+            <img id="begin-img" alt="البداية" loading="lazy" />
+            <div class="af-light"></div>
+            <figcaption><b>MEMORY No. 000</b><span>WHERE IT ALL STARTED</span></figcaption>
+          </figure>
+          <div class="begin-text rv">
+            <p data-bind="beginningText">—</p>
+          </div>
+        </div>
+        <div class="counter-block rv">
+          <p class="cnt-kicker">EVERY SECOND SINCE</p>
+          <div id="counter">
+            <div class="cell"><span class="num" id="cnt-y">00</span><span class="lab">سنة</span></div>
+            <i class="cnt-sep">·</i>
+            <div class="cell"><span class="num" id="cnt-mo">00</span><span class="lab">شهر</span></div>
+            <i class="cnt-sep">·</i>
+            <div class="cell"><span class="num" id="cnt-d">00</span><span class="lab">يوم</span></div>
+            <i class="cnt-sep">:</i>
+            <div class="cell"><span class="num" id="cnt-h">00</span><span class="lab">ساعة</span></div>
+            <i class="cnt-sep">:</i>
+            <div class="cell"><span class="num" id="cnt-mi">00</span><span class="lab">دقيقة</span></div>
+            <i class="cnt-sep">:</i>
+            <div class="cell"><span class="num" id="cnt-s">00</span><span class="lab">ثانية</span></div>
+          </div>
+          <p class="cnt-note">…وما زال العدّ مستمرًّا.</p>
+        </div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="3">
+            <span>ادخلي الكون الصغير</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: UNIVERSE ══════ -->
+    <section id="room-universe" class="room" data-tb="OUR UNIVERSE">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;02</p>
+          <h2 class="ch-title-en rv">OUR&nbsp;UNIVERSE</h2>
+          <h3 class="ch-title-ar rv">التفاصيل الصغيرة</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">كل نجمة هنا… ذكرى. اقتربي منها واضغطي عليها.</p>
+        </header>
+        <div class="uni-stage rv">
+          <canvas id="universe-canvas"></canvas>
+          <div id="uni-tooltip" class="uni-tooltip"></div>
+          <div id="memory-card" class="memory-card" hidden>
+            <span class="mc-num" id="mc-num">—</span>
+            <figure><img id="mc-img" alt="" loading="lazy" /></figure>
+            <h4 class="mc-title" id="mc-title">—</h4>
+            <p class="mc-date" id="mc-date">—</p>
+            <p class="mc-text" id="mc-text">—</p>
+            <button id="mc-back" class="btn-ghost">عودي إلى الكون</button>
+          </div>
+        </div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="4">
+            <span>إلى قاعة الذكريات</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: MUSEUM ══════ -->
+    <section id="room-museum" class="room" data-tb="THE MEMORIES">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;03</p>
+          <h2 class="ch-title-en rv">THE&nbsp;MEMORIES</h2>
+          <h3 class="ch-title-ar rv">قاعة الذكريات</h3>
+          <span class="ch-rule"></span>
+        </header>
+
+        <div class="hall-label rv">HALL&nbsp;I&nbsp;—&nbsp;THE&nbsp;FRAMES</div>
+        <div id="museum-grid" class="museum-grid"></div>
+        <div class="ghost-row rv">
+          <button id="sec-plaque" class="exhibit exhibit-ghost" aria-label="قطعة مخفية">
+            <span class="eg-num">No. ∞</span>
+            <span class="eg-txt">قطعة غير مُدرجة في الدليل</span>
+          </button>
+        </div>
+
+        <div class="hall-label rv">HALL&nbsp;II&nbsp;—&nbsp;MEMORY&nbsp;FILM</div>
+        <div class="film-viewer rv">
+          <div class="film-frame">
+            <span class="film-perf fp-t"></span>
+            <img id="film-img" alt="" loading="lazy" />
+            <span class="film-perf fp-b"></span>
+            <div class="film-flicker"></div>
+          </div>
+          <div class="film-caption">
+            <p class="fc-num" id="film-num">—</p>
+            <h4 class="fc-title" id="film-title">—</h4>
+            <p class="fc-date" id="film-date">—</p>
+            <p class="fc-text" id="film-text">—</p>
+          </div>
+          <div class="film-ctrl">
+            <button id="film-prev" class="btn-ghost">السابق</button>
+            <button id="film-next" class="btn-ghost">التالي</button>
+          </div>
+        </div>
+
+        <div class="hall-label rv">HALL&nbsp;III&nbsp;—&nbsp;THE&nbsp;TIME&nbsp;MACHINE</div>
+        <div class="tm-wrap rv">
+          <div id="tm-nodes" class="tm-nodes"></div>
+          <div id="tm-panel" class="tm-panel">
+            <p class="tm-year" id="tm-year">—</p>
+            <h4 class="tm-title" id="tm-title">—</h4>
+            <p class="tm-text" id="tm-text">—</p>
+            <p class="tm-future-line tmf-1" hidden>لم أكتب هذا الجزء بعد.</p>
+            <p class="tm-future-line tmf-2" hidden>لأنني أريد أن نكتبه معًا.</p>
+            <button id="sec-future" class="tm-secret" aria-label="نقطة مخفية"></button>
+          </div>
+        </div>
+
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="5">
+            <span>إلى ما لم يُقَل</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: NEVER SAID ══════ -->
+    <section id="room-never" class="room" data-tb="NEVER SAID">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;04</p>
+          <h2 class="ch-title-en rv">THE&nbsp;THINGS&nbsp;I&nbsp;NEVER&nbsp;SAID</h2>
+          <h3 class="ch-title-ar rv">ما لم أقله أبدًا</h3>
+          <span class="ch-rule"></span>
+        </header>
+
+        <div class="hall-label rv">EXHIBIT&nbsp;·&nbsp;THE&nbsp;MIRROR</div>
+        <div id="mirror-stage" class="mirror-stage rv">
+          <p id="mirror-hint" class="mirror-hint">اقتربي…</p>
+          <div class="mirror-words">
+            <span class="mw" style="--wx:22%;--wy:28%">ابتسامتك</span>
+            <span class="mw" style="--wx:68%;--wy:22%">صوتك</span>
+            <span class="mw" style="--wx:45%;--wy:42%">طموحك</span>
+            <span class="mw" style="--wx:18%;--wy:62%">تفاصيلك الصغيرة</span>
+            <span class="mw" style="--wx:78%;--wy:58%">طريقة تفكيرك</span>
+            <span class="mw" style="--wx:50%;--wy:78%">ضحكتك</span>
+          </div>
+          <div id="mirror-finale" class="mirror-finale" hidden>
+            <p>حاولتُ أن أجد سببًا واحدًا…<br/>
+            <span class="you-word" id="sec-youword">لكن بطريقةٍ ما… كان السبب دائمًا أنتِ.</span></p>
+          </div>
+        </div>
+
+        <div class="hall-label rv">EXHIBIT&nbsp;·&nbsp;DO&nbsp;YOU&nbsp;REMEMBER?</div>
+        <div id="quiz" class="quiz rv"></div>
+
+        <div class="hall-label rv">EXHIBIT&nbsp;·&nbsp;UNSENT&nbsp;LETTERS</div>
+        <div id="unsent-list" class="unsent-list rv"></div>
+
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="6">
+            <span>الفصل الذي يلي</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: YOU ══════ -->
+    <section id="room-you" class="room" data-tb="YOU">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;05</p>
+          <h2 class="ch-title-en rv">YOU</h2>
+          <h3 class="ch-title-ar rv">أنتِ</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">سبعة أسباب، من أصل ألف. اقلبي البطاقات.</p>
+        </header>
+        <div id="reasons-grid" class="reasons-grid rv"></div>
+        <div class="notes-block rv">
+          <p class="nb-hint">وكلما ضغطتِ هذا الزر… سأجد طريقة جديدة لأخبركِ.</p>
+          <button id="btn-note" class="btn-gold magnetic">
+            <span>OPEN&nbsp;A&nbsp;RANDOM&nbsp;NOTE</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="7">
+            <span>الأشياء التي أنتبه لها</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: OBSERVATIONS (NEW) ══════ -->
+    <section id="room-observations" class="room" data-tb="THE THINGS I NOTICE">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;06</p>
+          <h2 class="ch-title-en rv">THE&nbsp;THINGS&nbsp;I&nbsp;NOTICE</h2>
+          <h3 class="ch-title-ar rv">الأشياء الصغيرة التي أنتبه لها</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">أشياءٌ عنك… ربما لم يخبرك بها أحدٌ من قبل.</p>
+        </header>
+        <div id="obs-grid" class="obs-grid rv"></div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="8">
+            <span>افتحي عندما...</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: OPEN WHEN (NEW) ══════ -->
+    <section id="room-openwhen" class="room" data-tb="OPEN WHEN...">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;07</p>
+          <h2 class="ch-title-en rv">OPEN&nbsp;WHEN...</h2>
+          <h3 class="ch-title-ar rv">افتحي عندما...</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">ظروف صغيرة… لكل حالة من قلبك.</p>
+        </header>
+        <div id="ow-grid" class="ow-grid rv"></div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="9">
+            <span>اسمعي حاجة مش هكتبها</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: VOICE MEMORY (NEW) ══════ -->
+    <section id="room-voice" class="room" data-tb="A VOICE FOR YOU">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;08</p>
+          <h2 class="ch-title-en rv">LISTEN&nbsp;CLOSELY</h2>
+          <h3 class="ch-title-ar rv">اسمعي حاجة مش هكتبها</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">بعض الكلمات… لا تُكتب. تُقال.</p>
+        </header>
+        <div class="voice-stage rv">
+          <div class="voice-orb" id="voice-orb">
+            <canvas id="voice-wave" width="220" height="220"></canvas>
+            <button id="voice-play" class="voice-play-btn" aria-label="تشغيل">
+              <svg class="vp-ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <svg class="vp-ic-pause" viewBox="0 0 24 24" fill="currentColor" hidden><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+            </button>
+          </div>
+          <div class="voice-info">
+            <p class="voice-title">رسالة صوتية… لكِ فقط</p>
+            <div class="voice-bar">
+              <span id="voice-cur">0:00</span>
+              <div class="voice-progress"><span id="voice-fill"></span></div>
+              <span id="voice-dur">0:00</span>
+            </div>
+            <p id="voice-transcript" class="voice-transcript"></p>
+          </div>
+        </div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="10">
+            <span>If We Had A Day</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: DAY PLAN (NEW) ══════ -->
+    <section id="room-dayplan" class="room" data-tb="IF WE HAD A DAY">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;09</p>
+          <h2 class="ch-title-en rv">IF&nbsp;WE&nbsp;HAD&nbsp;A&nbsp;DAY</h2>
+          <h3 class="ch-title-ar rv">لو كان عندنا يوم</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">ذكرى لم تحدث بعد… لكنها موجودة في مكان ما.</p>
+        </header>
+        <div class="day-stage rv">
+          <div class="day-scene" id="day-scene">
+            <div class="day-bg" id="day-bg"></div>
+            <div class="day-content">
+              <p class="day-time" id="day-time">09:00</p>
+              <h4 class="day-title" id="day-title">—</h4>
+              <p class="day-text" id="day-text">—</p>
+            </div>
+          </div>
+          <div class="day-timeline" id="day-timeline"></div>
+          <p id="day-closer" class="day-closer" hidden>
+            يمكن اليوم ده لسه محصلش...<br/>
+            <span>بس مين قال إنه مستحيل؟</span>
+          </p>
+        </div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="11">
+            <span>جدار البولارويد</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: POLAROID (NEW) ══════ -->
+    <section id="room-polaroid" class="room" data-tb="POLAROID WALL">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;10</p>
+          <h2 class="ch-title-en rv">POLAROID&nbsp;WALL</h2>
+          <h3 class="ch-title-ar rv">جدار اللحظات</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">صور… لا تحتاج شرحًا. هي تشرح نفسها.</p>
+        </header>
+        <div id="polaroid-wall" class="polaroid-wall rv"></div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="12">
+            <span>أنتِ غيرتي...</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: CHANGED (NEW) ══════ -->
+    <section id="room-changed" class="room" data-tb="YOU CHANGED">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;11</p>
+          <h2 class="ch-title-en rv">YOU&nbsp;CHANGED</h2>
+          <h3 class="ch-title-ar rv">أنتِ غيرتي...</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">قبل أن ألتقي بكِ… وبعد.</p>
+        </header>
+        <div id="changed-list" class="changed-list rv"></div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="13">
+            <span>الصورة الأخيرة</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: LAST PHOTO (NEW) ══════ -->
+    <section id="room-lastphoto" class="room" data-tb="THE LAST PHOTOGRAPH">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">CHAPTER&nbsp;12</p>
+          <h2 class="ch-title-en rv">THE&nbsp;LAST&nbsp;PHOTOGRAPH</h2>
+          <h3 class="ch-title-ar rv">الصورة الأخيرة</h3>
+          <span class="ch-rule"></span>
+        </header>
+        <div class="lastphoto-stage rv">
+          <div class="lastphoto-frame" id="lastphoto-frame">
+            <img id="lastphoto-img" alt="" loading="lazy" />
+            <div class="lastphoto-shine"></div>
+          </div>
+          <p class="lastphoto-text">
+            الصورة دي مش أهم صورة...<br/>
+            <span>بس يمكن تكون الصورة اللي هتفتكري بيها كل اللي كان هنا.</span>
+          </p>
+        </div>
+        <div class="room-cta">
+          <button class="btn-gold goto-next magnetic" data-next="14">
+            <span>كملي</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ ROOM: FINAL ══════ -->
+    <section id="room-final" class="room" data-tb="THE FINAL CHAPTER">
+      <div class="room-inner">
+        <header class="ch-head">
+          <p class="ch-kicker rv">THE&nbsp;FINAL&nbsp;CHAPTER</p>
+          <h2 class="ch-title-en rv">THE&nbsp;FINALE</h2>
+          <h3 class="ch-title-ar rv">الفصل الأخير</h3>
+          <span class="ch-rule"></span>
+          <p class="ch-desc rv">كل الطرق هنا… كانت تؤدي إلى هذه اللحظة.</p>
+        </header>
+
+        <div class="final-entry rv">
+          <p class="fe-line">سؤال واحد بس… قبل أن نصل للنهاية.</p>
+          <div class="final-question">
+            <p id="fq-text" class="fq-text"></p>
+            <textarea id="fq-input" class="fq-input" rows="3" placeholder="اكتبي هنا..." maxlength="400"></textarea>
+            <p id="fq-counter" class="fq-counter">0 / 400</p>
+            <button id="fq-submit" class="btn-gold magnetic">
+              <span>احفظيها</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12l5 5L20 7"/></svg>
+            </button>
+            <p id="fq-thanks" class="fq-thanks" hidden>شكرًا… هذه الإجابة الآن جزء من العالم.</p>
+          </div>
+        </div>
+
+        <div class="final-entry rv" style="margin-top:40px">
+          <button id="btn-final-scene" class="btn-gold magnetic">
+            <span>ENTER&nbsp;THE&nbsp;FINAL&nbsp;SCENE</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <p id="fe-egg-hint" class="fe-small" hidden>هناك شيء واحد متبقٍّ… للّتي وجدت كل الأسرار.</p>
+        </div>
+
+        <div id="certificate" class="certificate rv" hidden>
+          <div class="cert-frame"></div>
+          <p class="cert-star">✦&nbsp;&nbsp;CERTIFICATE&nbsp;&nbsp;✦</p>
+          <h4 class="cert-title">THE&nbsp;MOST<br/>SPECIAL&nbsp;CHAPTER</h4>
+          <span class="cert-rule"></span>
+          <p class="cert-pre">Presented to</p>
+          <p class="cert-name" data-bind="herName">—</p>
+          <p class="cert-text">لأنكِ صرتِ الفصلَ الذي لا يُنسى<br/>في حكاية حياتي.</p>
+          <p class="cert-year" data-bind="certificateYear">—</p>
+          <button id="sec-7" class="cert-seal" aria-label="ختم الشهادة">✦</button>
+        </div>
+
+        <div id="egg-area" class="egg-area" hidden>
+          <p class="egg-line">✦&nbsp;وجدتِ كلَّ شيء. 7 / 7&nbsp;✦</p>
+          <button id="btn-egg" class="btn-gold magnetic">
+            <span>ONE&nbsp;LAST&nbsp;THING</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M2 12h20"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /room-wrap -->
+</div><!-- /experience -->
+
+<!-- ═══════════ MENU OVERLAY ═══════════ -->
+<div id="menu" class="menu-ov" hidden>
+  <div class="menu-head">
+    <p class="menu-kicker">THE&nbsp;INDEX</p>
+    <button id="menu-close" class="icon-btn" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <nav id="menu-list" class="menu-list"></nav>
+</div>
+
+<!-- ═══════════ MUSIC FAB ═══════════ -->
+<button id="love-fab" class="magnetic" aria-label="رسالة">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+</button>
+<button id="music-fab" aria-label="NOW PLAYING">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+  <span class="fab-eq"><i></i><i></i><i></i></span>
+</button>
+<div id="music-panel" class="music-panel" hidden>
+  <div class="mp-head">
+    <span>NOW&nbsp;PLAYING</span>
+    <button id="mp-close" class="icon-btn" aria-label="إغلاق" style="width:28px;height:28px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div id="mp-tracks" class="mp-tracks"></div>
+  <p id="mp-status" class="mp-status">اختاري مقطوعة لتبدأ الحالة المزاجية.</p>
+</div>
+
+<!-- ═══════════ TOASTS ═══════════ -->
+<div id="toast" class="toast"><span class="t-star">✦</span><p id="toast-text"></p></div>
+<div id="secret-toast" class="secret-toast">
+  <p class="st-kicker">SECRET&nbsp;DISCOVERED</p>
+  <span id="st-no" class="st-no">01 / 07</span>
+  <p id="st-msg" class="st-msg"></p>
+</div>
+<div id="unlock-flash" class="unlock-flash">
+  <div class="uf-ring"></div>
+  <p class="uf-kicker">MEMORY&nbsp;UNLOCKED</p>
+  <p id="uf-sub" class="uf-sub"></p>
+</div>
+
+<!-- ═══════════ LIGHTBOX ═══════════ -->
+<div id="lightbox" class="lightbox" hidden>
+  <button id="lb-close" class="lb-close icon-btn" aria-label="إغلاق">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
+  </button>
+  <figure class="lb-fig">
+    <img id="lb-img" alt="" />
+    <figcaption class="lb-cap">
+      <p id="lb-num" class="lb-num">—</p>
+      <h4 id="lb-title">—</h4>
+      <p id="lb-date" class="lb-date">—</p>
+      <p id="lb-text">—</p>
+    </figcaption>
+  </figure>
+</div>
+
+<!-- ═══════════ UNSENT MODAL ═══════════ -->
+<div id="um" class="um" hidden>
+  <div class="um-card">
+    <button id="um-close" class="lb-close icon-btn" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <p id="um-no" class="um-no">—</p>
+    <p id="um-text" class="um-text">—</p>
+  </div>
+</div>
+
+<!-- ═══════════ NOTE MODAL ═══════════ -->
+<div id="note-modal" class="note-modal" hidden>
+  <div class="note-card">
+    <button id="note-close" class="lb-close icon-btn" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <p class="note-star">✦</p>
+    <p id="note-text">—</p>
+  </div>
+</div>
+
+<!-- ═══════════ OPEN-WHEN MODAL ═══════════ -->
+<div id="ow-modal" class="note-modal" hidden>
+  <div class="note-card ow-card">
+    <button id="ow-close" class="lb-close icon-btn" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <p class="note-star">✦</p>
+    <p id="ow-title" class="ow-title">—</p>
+    <div class="ow-type-wrap">
+      <p id="ow-text" class="ow-text"></p>
+      <span id="ow-caret" class="type-caret"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ EGG MODAL ═══════════ -->
+<div id="egg-modal" class="egg-modal" hidden>
+  <div class="egg-card">
+    <button id="egg-close" class="lb-close icon-btn" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div id="egg-lines"></div>
+  </div>
+</div>
+
+<!-- ═══════════ FINAL SCENE ═══════════ -->
+<div id="final-scene" class="final-scene" hidden>
+  <div id="fs-stage" class="fs-stage"></div>
+  <button id="fs-skip" class="fs-skip">تخطّي المشهد</button>
+  <div id="fs-end" class="fs-end" hidden>
+    <button id="fs-done" class="btn-gold magnetic">
+      <span>أغلقيها بلطف</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
